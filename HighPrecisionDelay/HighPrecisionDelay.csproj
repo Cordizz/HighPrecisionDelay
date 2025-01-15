@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Cordis.$(AssemblyName)</PackageId>
+    <Title>Cordis.HighPrecisionDelay</Title>
+    <Authors>Cordis</Authors>
+    <Description>High Precision Delay for .NET Core. Uses Multimedia Timer on Windows and timerfd on Linux.</Description>
+  </PropertyGroup>
+
+</Project>
