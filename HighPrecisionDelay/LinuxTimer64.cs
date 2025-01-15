@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 
 internal class LinuxTimer64 : IDelay, IDisposable
 {
@@ -13,9 +13,9 @@ internal class LinuxTimer64 : IDelay, IDisposable
         if (fileDescriptor == -1) throw new Exception($"Unable to create timer, error = {Marshal.GetLastWin32Error()}");
     }
 
-    public void Delay(int delay)
+    public void WaitFor(int msDelay)
     {
-        SetPeriod(delay);
+        SetPeriod(msDelay);
         Wait();
     }
 
@@ -26,7 +26,7 @@ internal class LinuxTimer64 : IDelay, IDisposable
 
     private void SetPeriod(int periodMs)
     {
-        SetFrequency((uint)periodMs * 1000);
+        SetFrequency((uint)periodMs * 1000); // 1000микросекунд = 1миллисекунда
     }
 
     private void SetFrequency(uint period)
@@ -35,7 +35,7 @@ internal class LinuxTimer64 : IDelay, IDisposable
         var ns = (period - sec * 1000000) * 1000;
         var itval = new Interop64.itimerspec64
         {
-            it_interval = new Interop64.timespec64 { tv_sec = sec, tv_nsec = ns },
+            it_interval = new Interop64.timespec64 { tv_sec = 0, tv_nsec = 0 }, // 0, чтобы установить разовый таймер
             it_value = new Interop64.timespec64 { tv_sec = sec, tv_nsec = ns }
         };
 

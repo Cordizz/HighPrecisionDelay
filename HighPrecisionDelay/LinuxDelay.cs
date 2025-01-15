@@ -1,10 +1,10 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 
 internal class LinuxDelay : IDelay, IDisposable
 {
-    private int fileDescriptor;
+    private readonly int fileDescriptor;
 
     public LinuxDelay()
     {
@@ -13,9 +13,9 @@ internal class LinuxDelay : IDelay, IDisposable
         if (fileDescriptor == -1) throw new Exception($"Unable to create timer, error = {Marshal.GetLastWin32Error()}");
     }
 
-    public void Delay(int delay)
+    public void WaitFor(int msDelay)
     {
-        SetPeriod(delay);
+        SetPeriod(msDelay);
         Wait();
     }
 
@@ -35,7 +35,7 @@ internal class LinuxDelay : IDelay, IDisposable
         var ns = (period - sec * 1000000) * 1000;
         var itval = new Interop.itimerspec
         {
-            it_interval = new Interop.timespec { tv_sec = sec, tv_nsec = ns },
+            it_interval = new Interop.timespec { tv_sec = 0, tv_nsec = 0 }, // 0, чтобы таймер начал отсчёт заново один раз
             it_value = new Interop.timespec { tv_sec = sec, tv_nsec = ns }
         };
 

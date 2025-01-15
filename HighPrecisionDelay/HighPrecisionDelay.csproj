@@ -9,6 +9,25 @@
     <Title>Cordis.HighPrecisionDelay</Title>
     <Authors>Cordis</Authors>
     <Description>High Precision Delay for .NET Core. Uses Multimedia Timer on Windows and timerfd on Linux.</Description>
+    <RepositoryUrl>https://github.com/Cordizz/HighPrecisionDelay</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>high, precision, delay, resolution, high resolution, high resolution delay, highresolution, highprecision, highresolutiontimer, highprecisiontimer, timer</PackageTags>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Version>1.1.0</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Added async delay</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

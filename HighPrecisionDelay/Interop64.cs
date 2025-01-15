@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 // Disable these StyleCop rules for this file, as we are using native names here.
 #pragma warning disable IDE1006 // Element should begin with upper-case letter
 

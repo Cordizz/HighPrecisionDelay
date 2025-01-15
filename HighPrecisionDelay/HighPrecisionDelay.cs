@@ -1,10 +1,10 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 
 /// <summary>
 ///     High performance (precision) delay based on timerfd or windows mm timer.
-///     It's not perfect because some time is spent to call external function.
+///     It's not perfect because some time is spent to call an external function.
 /// </summary>
 public class HighPrecisionDelay : IDelay, IDisposable
 {
@@ -14,7 +14,7 @@ public class HighPrecisionDelay : IDelay, IDisposable
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            delay = new MultimediaDelay();
+            delay = new WindowsMultimediaDelay();
         }
         else
         {
@@ -24,14 +24,31 @@ public class HighPrecisionDelay : IDelay, IDisposable
                 delay = new LinuxDelay();
         }
     }
-
+    /// <summary>
+    /// Usually doesnt need to be disposed.
+    /// </summary>
     public void Dispose()
     {
         delay.Dispose();
     }
 
-    public void Delay(int delay)
+    public void WaitFor(int msDelay)
     {
-        this.delay.Delay(delay);
+        delay.WaitFor(msDelay);
+    }
+
+    public static void Wait(int delay)
+    {
+        using var highPrecisionDelay = new HighPrecisionDelay();
+        highPrecisionDelay.WaitFor(delay);
+    }
+
+    public static async Task WaitAsync(int delay)
+    {
+        await Task.Run(() =>
+        {
+            using var highPrecisionDelay = new HighPrecisionDelay();
+            highPrecisionDelay.WaitFor(delay);
+        });
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 
 internal static class NativeMethods
 {

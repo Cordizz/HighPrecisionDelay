@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace HighPrecisionDelay;
+namespace Cordis.HighPrecisionDelay;
 
 /// <summary>
 ///     A timer based on the multimedia timer API with 1ms precision.
 /// </summary>
-internal class MultimediaDelay : IDelay, IDisposable
+internal class WindowsMultimediaDelay : IDelay, IDisposable
 {
-    private const int EventTypeSingle = 0;
-    private const int EventTypePeriodic = 1;
+    private const int TIME_ONESHOT = 0;
+    private const int TIME_PERIODIC = 1;
 
     // Hold the timer callback to prevent garbage collection.
     private readonly MultimediaTimerCallback callback;
@@ -26,12 +26,13 @@ internal class MultimediaDelay : IDelay, IDisposable
         get => interval;
         set
         {
+            if (interval == value) return;
             CheckDisposed();
 
             if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
 
             interval = value;
-            if (Resolution > Interval) Resolution = value;
+            if (Resolution > value) Resolution = value;
         }
     }
 
@@ -56,19 +57,18 @@ internal class MultimediaDelay : IDelay, IDisposable
     /// </summary>
     private bool IsRunning => timerId != 0;
 
-    public MultimediaDelay()
+    public WindowsMultimediaDelay()
     {
         callback = TimerCallbackMethod;
-        Resolution = 5;
+        Resolution = 0;
         Interval = 10;
     }
 
-    public void Delay(int delay)
+    public void WaitFor(int msDelay)
     {
-        SetPeriod(delay);
+        Interval = msDelay;
         Start();
         triggerEvent.WaitOne();
-        Stop();
         triggerEvent.Reset();
     }
 
@@ -77,7 +77,7 @@ internal class MultimediaDelay : IDelay, IDisposable
         Dispose(true);
     }
 
-    ~MultimediaDelay()
+    ~WindowsMultimediaDelay()
     {
         Dispose(false);
     }
@@ -88,11 +88,8 @@ internal class MultimediaDelay : IDelay, IDisposable
 
         if (IsRunning) throw new InvalidOperationException("Timer is already running");
 
-        // Event type = 0, one off event
-        // Event type = 1, periodic event
         uint userCtx = 0;
-        timerId = NativeMethods.TimeSetEvent((uint)Interval, (uint)Resolution, callback, ref userCtx,
-                                             EventTypePeriodic);
+        timerId = NativeMethods.TimeSetEvent((uint)Interval, (uint)Resolution, callback, ref userCtx, TIME_ONESHOT);
         if (timerId == 0)
         {
             var error = Marshal.GetLastWin32Error();
@@ -119,7 +116,9 @@ internal class MultimediaDelay : IDelay, IDisposable
 
     private void TimerCallbackMethod(uint id, uint msg, ref uint userCtx, uint rsv1, uint rsv2)
     {
+        timerId = 0;
         triggerEvent.Set();
+        NativeMethods.TimeKillEvent(id);
     }
 
     private void CheckDisposed()
@@ -135,10 +134,5 @@ internal class MultimediaDelay : IDelay, IDisposable
         if (IsRunning) StopInternal();
 
         if (disposing) GC.SuppressFinalize(this);
-    }
-
-    private void SetPeriod(int periodMs)
-    {
-        Interval = periodMs;
     }
 }
