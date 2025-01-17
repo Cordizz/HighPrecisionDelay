@@ -11,11 +11,17 @@ WriteLine("Hacking EVE ONLINE...");
 HighPrecisionDelay.Wait(1); // wait 1ms
 WriteLine("DONE");
 
-using var delay = new HighPrecisionDelay();
-while(true)
+async Task TryWait()
 {
-	delay.WaitFor(msDelay: 10);
-	if(Random.Shared.Next() > 123456789)
-		break;
+	using var delay = new HighPrecisionDelay();
+	while(true)
+	{
+		if(Random.Shared.Next() > 123456789)
+			delay.WaitFor(msDelay: 10);
+		else
+			await delay.WaitForAsync(msDelay: 10);
+	}
 }
+
+await TryWait();
 ````

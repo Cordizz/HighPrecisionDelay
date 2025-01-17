@@ -24,9 +24,7 @@ public class HighPrecisionDelay : IDelay, IDisposable
                 delay = new LinuxDelay();
         }
     }
-    /// <summary>
-    /// Usually doesnt need to be disposed.
-    /// </summary>
+
     public void Dispose()
     {
         delay.Dispose();
@@ -37,6 +35,11 @@ public class HighPrecisionDelay : IDelay, IDisposable
         delay.WaitFor(msDelay);
     }
 
+    public async Task WaitForAsync(int msDelay)
+    {
+        await Task.Run(()=>delay.WaitFor(msDelay));
+    }
+
     public static void Wait(int delay)
     {
         using var highPrecisionDelay = new HighPrecisionDelay();
@@ -45,10 +48,7 @@ public class HighPrecisionDelay : IDelay, IDisposable
 
     public static async Task WaitAsync(int delay)
     {
-        await Task.Run(() =>
-        {
-            using var highPrecisionDelay = new HighPrecisionDelay();
-            highPrecisionDelay.WaitFor(delay);
-        });
+        using var highPrecisionDelay = new HighPrecisionDelay();
+        await highPrecisionDelay.WaitForAsync(delay);
     }
 }
